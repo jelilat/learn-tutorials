@@ -1,4 +1,4 @@
-# Crowdfunding Module
+# Build a Crowdfunding Module
 
 As blockchain technology gains more popularity and increasing adoption, it opens up a new era of crowdfunding. 
 
