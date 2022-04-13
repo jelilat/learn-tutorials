@@ -1,10 +1,14 @@
-# Build a Crowdfunding Module
+# Build a Crowdfunding Module with Ignite
+
+# Introduction
 
 As blockchain technology gains more popularity and increasing adoption, it opens up a new era of crowdfunding. 
 
 More people are openly funding open-source projects and it is easier than ever for builders to receive funding for their projects from across the globe irrespective of their location. This is something that is almost impossible with the traditional crowdfunding platforms.
 
-In this tutorial, you will learn some basic crowdfunding model and use [Starport](https://starport.com/) to build a crowdfunding module of your own. Your crowdfunding module will enable users create a crowdfunding campaign, pledge a donation, claim the donations if the goal is met, and also get refunds if the campaign's goal is not met.
+In this tutorial, you will learn some basic crowdfunding model and use [Ignite](https://ignite.com/cli/) to build a crowdfunding module of your own. Your crowdfunding module will enable users create a crowdfunding campaign, pledge a donation, claim the donations if the goal is met, and also get refunds if the campaign's goal is not met.
+
+Ignite makes it easier for you to create your own blockchain module without writing long lines of code. With just a single command, it will generate boilerplate code so you can focus on the application logic that makes your project unique. 
 
 **By the end of this tutorial, you will be able to:**
 
@@ -19,21 +23,55 @@ In this tutorial, you will learn some basic crowdfunding model and use [Starport
 * Donate to a crowdfunding campaign
 * Withdraw funds from a crowdfunding campaign
 
-**Note:** *The code in this tutorial is written specifically for this learning experience and is intended only for educational purposes. This tutorial code is not intended to be used in production.*
+# Prerequisites
 
-## Prerequisites
+This tutorial is written in Golang and assumes that you atleast have basic understanding of the language. However, if you do not have any experience writing Golang, you can take this beginner-friendly course from [Codecademy](https://www.codecademy.com/learn/learn-go) to get started.
+
+Once you've done that, it'll be easier to understand this tutorial.
+
+# Requirements
 
 * **Golang**: Make sure you have Golang installed on your machine. If you don't already have it, you can install it by following the instructions [here](https://golang.org/doc/install). 
 
 	You also need to be familiar with Golang syntax to follow along with this tutorial.
-* **Starport**: The Starport CLI is responsible for scaffolding the blockchain and the crowdfund module. If you don't already have Starport installed, you can run the folloowing command in your terminal.
+* **Ignite**: The Ignite CLI is responsible for scaffolding the blockchain and the crowdfund module. If you don't already have Ignite installed, you can run the folloowing command in your terminal.
 
+	```text
+	$ curl https://get.ignite.com/ignite! | bash
 	```
-	$ curl https://get.starport.com/starport! | bash
-	```
-	In case you encounter any errors during the installation, you can find a detailed installation guide [here](https://docs.starport.com/guide/install.html).
+	In case you encounter any errors during the installation, you can find a detailed installation guide [here](https://docs.ignite.com/guide/install.html).
 
 Now that you are fully setup with the prerequisites, you can proceed to the next section.
+
+# Getting Started
+
+## Terminologies
+
+During the course of this tutorial, we will be mentioning a few terminologies that may be alien to you. Therefore, we will be explaining them here to make the tutorial easier to follow along with.
+
+### Modules
+
+A module is a collection of related functions that can be used in a blockchain application. Blockchain modules follow the same conventions as the traditional modules in other languages.
+
+The crowdfunding module, for instance, is just a set of functions that can be used to execute a crowdfunding campaign.
+
+Modules contain one or more [`Messages`](#messages).
+
+### Messages
+
+Messages are objects that trigger state-transitions. They are functions inside a module.
+
+However, unlike in conventional modular programming architecture, messages are functions of functions. They can be executed by sending a transaction to the module.
+
+### Scaffold
+
+When you scaffold any part of an application, you are automatically generating the code that is required for it to run. Instead of spending hours writing so much code from scratch, Ignite will automatically generate the code for you.
+
+### Transactions
+
+Transactions are objects created by end-users to trigger state changes in the application (e.g. creating a gofundme campaign, making a donation to the campaign, etc.). When a user sends a transaction, they are sending a [`message`](#messages) to the application.
+
+This is similar to calling an application's function. 
 
 ## Module Design
 
@@ -75,35 +113,37 @@ Great! Now let's get started with the actual implementation.
 
 ## Scaffold the Blockchain 
 
-Use Starport to scaffold a fully functional Cosmos SDK blockchain app named `gofundme` with the following command.
+Use Ignite to scaffold a fully functional Cosmos SDK blockchain app named `gofundme` with the following command.
 
-```
-starport scaffold chain github.com/cosmonaut/gofundme --no-module
+```text
+ignite scaffold chain github.com/cosmonaut/gofundme --no-module
 ```
 
 The `--no-module` flag prevents scaffolding a default module. Don't worry, you will add the `gofundme` module later.
 
 Go into the newly created `gofundme` directory:
 
-```golang
+```text
 cd gofundme
 ``` 
 ## Building a Blockchain Module
 
 Scaffold the module to create a new `gofundme` module. Following the Cosmos SDK convention, all modules are scaffolded inside the `x` directory:
 
-```
-starport scaffold module gofundme --dep bank
+```text
+ignite scaffold module gofundme --dep bank
 ```
 
 Use the `--dep` flag to specify that this module depends on and is going to interact with the Cosmos SDK `bank` module.
 
-## Scaffold a List
+You can think of this like importing a package or library into your project. Once you add the `bank` module as a dependency, you can use the `bank` module's functions in your `gofundme` module.
 
-Use the [scaffold list](https://docs.starport.com/cli/#starport-scaffold-list) command to scaffold code necessary to store `gofundme` campaigns in an array-like data structure:
+## Scaffolding a List
 
-```
-starport scaffold list gofundme creator goal:uint start end totaldonations:uint claim:bool donation:array.string donor:array.string --no-message
+Use the [scaffold list](https://docs.ignite.com/cli/#ignite-scaffold-list) command to scaffold code necessary to store `gofundme` campaigns in an array-like data structure:
+
+```text
+ignite scaffold list gofundme creator goal:uint start end totaldonations:uint claim:bool donation:array.string donor:array.string --no-message
 ```
 
 By default, each variable defined in the list is a `string` type. You can change the type of the variable by using the `:` flag. For example, to change the type of the `goal` variable to `uint`, use the `goal:uint` flag.
@@ -114,7 +154,7 @@ Use the `--no-message` flag to disable CRUD messages in the scaffold.
 
 The data you store in an array-like data structure are the `gofundme` campaigns. You can see the parameters defined above in the `Gofundme` message in `proto/gofundme/gofundme.proto`:
 
-```
+```text
 message Gofundme {
   uint64 id = 1;
   string creator = 2; 
@@ -131,12 +171,12 @@ message Gofundme {
 
 Now, it is time to use messages to interact with the gofundme module. But first, make sure to store your current state in a git commit:
 
-```golang
+```text
 git add .
 git commit -m "Scaffold gofundme and list modules" 
 ```
 
-## Scaffold the Messages
+## Scaffolding the Messages
 
 In order to create a gofundme app, you need the following messages:
 
@@ -144,17 +184,17 @@ In order to create a gofundme app, you need the following messages:
 * Donate Fund
 * Withdraw Donation
 
-You can use the `starport scaffold message` command to create each of the messages. Meke sure you define the details of each message when you scaffold them.
+You can use the `ignite scaffold message` command to create each of the messages. Meke sure you define the details of each message when you scaffold them.
 
 Create the messages one at a time with the following application logic.
 
-### Create Gofundme
+### Create a Gofundme Campaign
 
-For a gofundme, the initial message handles the transaction when an account (or user) creates a gofundme campaign.
+The initial message handles the transaction that occurs when an account (or user) creates a gofundme campaign.
 
-The user needs a certain amount of funds and is requesting donations from other users.
+In this case, the user needs a certain amount of funds and is requesting donations from other users.
 
-The first message is the `create-gofundme` message, which requires the following input parameters:
+Therefore, the first message is the `create-gofundme` message, which requires the following input parameters:
 
 * `goal`: The amount of funds the user is requesting
 * `start`: The start date of the gofundme campaign
@@ -162,8 +202,8 @@ The first message is the `create-gofundme` message, which requires the following
 
 Create a message with the following command:
 
-```
-starport scaffold message create-gofundme goal:uint start end 
+```text
+ignite scaffold message create-gofundme goal:uint start end 
 ```
 Define the `goal` as a `uint` and the `start` and `end` as `string` types.
 
@@ -268,21 +308,21 @@ Congratulations, you have created the `create-gofundme` message.
 You can run the chain and test your first message.
 
 Open a new CLI to start the blockchain:
-```
-starport chain serve
+```text
+ignite chain serve
 ```
 Create your first gofundme campaign:
-```
+```text
 gofundmed tx gofundme create-gofundme 100 2022-04-02T15:04:05.000000000 2022-05-02T15:04:05.000000000 --from alice
 ```
 You can also experiment with invalid inputs to see how the validator will throw errors.
 
 Query your gofundme campaign:
-```
+```text
 gofundmed query gofundme list-gofundme
 ```
 The output should be something like this:
-```
+```text
 Gofundme:
 - claim: false
   creator: cosmos180m28ygyt3gapllfq0mgy28na6uzfs9hjggk9f
@@ -303,7 +343,7 @@ You can stop the blockchain again with `CTRL+C` or `CMD+C`.
 
 This is a good time to add your advancements to git:
 
-```
+```text
 git add .
 git commit -m "Scaffold create-gofundme message"
 ```
@@ -319,8 +359,8 @@ The next message is the `donate-fund` message, which requires the following inpu
 
 Create the `donate-fund` message with the following command:
 
-```
-starport scaffold message donate-fund id:uint donation
+```text
+ignite scaffold message donate-fund id:uint donation
 ```
 `id`s are stored as a `uint` by default. Therefore, you need to define the `id` as a `uint` type.
 
@@ -402,30 +442,30 @@ type BankKeeper interface {
 ```
 Restart the blockchain and use the two commands you already have available:
 
-```
-starport chain serve -r
+```text
+ignite chain serve -r
 ```
 Use the `-r` flag to reset the blockchain state and start with a new database.
 
 Now, let `alice` create a gofundme campaign:
-```
+```text
 gofundmed tx gofundme create-gofundme 100 now 2022-05-02T15:04:05.000000000 --from alice
 ```
 Start the campaign immediately by setting the `start` date to `now`.
 
 Query your gofundme campaign:
-```
+```text
 gofundmed query gofundme list-gofundme
 ```
 
 Donate to `alice`'s gofundme campaign:
-```
+```text
 gofundmed tx gofundme donate-fund 0 100token --from bob
 ```
 This donates 100 tokens to `alice`'s gofundme campaign.
 
 Query the gofundme campaign again:
-```
+```text
 Gofundme:
 - claim: false
   creator: cosmos16fjh2va2drgnulxcnpeqcu6wzmhsajgwx3syqy
@@ -448,7 +488,7 @@ Play around with it and try donating different amounts to see how the total dona
 
 This is a good time to save the state with a git commit:
 
-```
+```text
 git add .
 git commit -m "Add donate-fund message"
 ```
@@ -458,8 +498,8 @@ git commit -m "Add donate-fund message"
 After the campaign is over, you can withdraw the donations. If the campaign goal is met, the creator of the campaign can withdraw the donations. Otherwise, donors can initiate a refund.
 
 Scaffold the message `withdraw-donation` with the following command:
-```
-starport scaffold message withdraw-donation id:uint
+```text
+ignite scaffold message withdraw-donation id:uint
 ```
 
 Withdrawing donations requires that the campaign is over and `claim` is set to `no`. If these conditions are met, then `donation` is released from the escrow module account.
@@ -575,28 +615,28 @@ type BankKeeper interface {
 }
 ```
 Now, restart the blockchain again to test all your code.
-```
-starport chain serve -r
+```text
+ignite chain serve -r
 ```
 Create a new gofundme campaign with the following command:
-```
+```text
 gofundmed tx gofundme create-gofundme 100 now 2022-05-02T15:04:05.000000000 --from alice
 ```
 Start the campaign immediately by setting the `start` date to `now`. to test this out immediately, ensure that the `end` date is only a few minutes from now.
 
 Query your gofundme campaign:
-```
+```text
 gofundmed query gofundme list-gofundme
 ```
 
 Donate to `alice`'s gofundme campaign:
-```
+```text
 gofundmed tx gofundme donate-fund 0 100token --from bob
 ```
 This donates 100 tokens to `alice`'s gofundme campaign.
 
 Query the gofundme campaign again:
-```
+```text
 Gofundme:
 - claim: false
   creator: cosmos16fjh2va2drgnulxcnpeqcu6wzmhsajgwx3syqy
@@ -615,11 +655,11 @@ pagination:
 ```
 
 Withdraw your donations:
-```
+```text
 gofundmed tx gofundme withdraw-donation 0 --from alice
 ```
 Query the gofundme campaign again:
-```
+```text
 Gofundme:
 - claim: true
   creator: cosmos176zax4hdqrpda3qcv8h2vwhsugc7u64z4nvs77
@@ -642,12 +682,12 @@ Play around with it a little more to see how the validations work.
 
 Update your local repository again with a git commit. After you test and use your loan module, consider publishing your code to a public repository for others to see your accomplishments.
 
-```
+```text
 git add .
 git commit -m "Add withdraw-donation module"
 ```
 
-## Complete
+# Conclusion
 
 Congratulations! You have completed the gofundme module tutorial.
 
@@ -664,4 +704,10 @@ You executed commands and updated files to:
     * Donate Fund
     * Withdraw Donation
 
-The code for this tutorial can be found [here](https://github.com/jelilat/gofundme).
+The complete code for this tutorial can be found on [Github](https://github.com/jelilat/gofundme)
+
+**Note:** *The code in this tutorial is written specifically for this learning experience and is intended only for educational purposes. This tutorial code is not intended to be used in production.*
+
+# About the Author
+
+This tutorial was created by [Jelilat Anofiu](https://github.com/jelilat/). If you'd like to stay up-to-date with my tutorials, follow me on [Medium](https://medium.com/@jelilah/) and [@tjelailah](https://twitter.com/tjelailah) on Twitter.
