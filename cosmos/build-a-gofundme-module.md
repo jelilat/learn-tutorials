@@ -711,3 +711,8 @@ The complete code for this tutorial can be found on [Github](https://github.com/
 # About the Author
 
 This tutorial was created by [Jelilat Anofiu](https://github.com/jelilat/). If you'd like to stay up-to-date with my tutorials, follow me on [Medium](https://medium.com/@jelilah/) and [@tjelailah](https://twitter.com/tjelailah) on Twitter.
+
+# References
+
+ - [Cosmos Network](https://docs.cosmos.network/master/)
+ - [Ignite](https://docs.ignite.com/guide/)
